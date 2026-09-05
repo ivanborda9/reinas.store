@@ -101,6 +101,45 @@ export default async function ConfiguracionPage({
           </p>
         </div>
 
+        <div className="rounded-lg border border-brand-100 bg-brand-50 p-4">
+          <h2 className="mb-3 text-sm font-semibold text-brand-800">Datos para transferencia</h2>
+          <p className="mb-3 text-xs text-brand-700">
+            Se muestran a la clienta después de confirmar su compra, para que transfiera y envíe el
+            comprobante.
+          </p>
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Alias</label>
+              <input
+                name="transferAlias"
+                required
+                defaultValue={settings.transferAlias}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Titular</label>
+              <input
+                name="transferHolderName"
+                required
+                defaultValue={settings.transferHolderName}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Número para enviar el comprobante
+              </label>
+              <input
+                name="transferPhone"
+                required
+                defaultValue={settings.transferPhone}
+                className="w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2"
+              />
+            </div>
+          </div>
+        </div>
+
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Margen de ganancia objetivo (%)

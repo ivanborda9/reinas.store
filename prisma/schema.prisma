@@ -79,6 +79,9 @@ model SiteSettings {
   bannerImageUrl      String?
   whatsappNumber      String   @default("")
   targetMarginPercent Float?
+  transferAlias       String   @default("REINASXL.NARANJA")
+  transferHolderName  String   @default("Nahir Borda")
+  transferPhone       String   @default("2302-667574")
   updatedAt           DateTime @updatedAt
 }
 

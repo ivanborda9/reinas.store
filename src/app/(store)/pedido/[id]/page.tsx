@@ -65,8 +65,8 @@ export default async function OrderConfirmationPage({
         APROBADO: { icon: "✓", color: "green", title: "¡Pago aprobado!" },
         RECHAZADO: { icon: "✕", color: "red", title: "El pago fue rechazado" },
         PENDIENTE: { icon: "…", color: "yellow", title: "Tu pago está siendo procesado" },
-      }[order.paymentStatus] ?? { icon: "✓", color: "green", title: "¡Gracias por tu pedido!" }
-    : { icon: "✓", color: "green", title: "¡Gracias por tu pedido!" };
+      }[order.paymentStatus] ?? { icon: "✓", color: "green", title: "¡Gracias por tu compra!" }
+    : { icon: "✓", color: "green", title: "¡Gracias por tu compra!" };
 
   const colorClasses: Record<string, string> = {
     green: "bg-green-100 text-green-600",
@@ -87,8 +87,24 @@ export default async function OrderConfirmationPage({
           ? `Pedido #${order.id.slice(-6).toUpperCase()}: el pago no se pudo procesar. Podés reintentar con otra tarjeta o coordinar por WhatsApp.`
           : isMercadoPago && order.paymentStatus === "PENDIENTE"
             ? `Pedido #${order.id.slice(-6).toUpperCase()} recibido. Te vamos a avisar apenas se confirme el pago.`
-            : `Pedido #${order.id.slice(-6).toUpperCase()} recibido. Te contactaremos a la brevedad para coordinar el envío.`}
+            : `Pedido #${order.id.slice(-6).toUpperCase()} recibido.`}
       </p>
+
+      {!isMercadoPago && (
+        <div className="mt-6 rounded-xl border border-brand-200 bg-brand-50 p-5 text-left">
+          <h2 className="mb-2 font-bold text-brand-900">Datos para transferir</h2>
+          <p className="text-sm text-gray-700">
+            Alias: <span className="font-semibold">{settings.transferAlias}</span>
+          </p>
+          <p className="text-sm text-gray-700">
+            Titular: <span className="font-semibold">{settings.transferHolderName}</span>
+          </p>
+          <p className="mt-2 text-sm text-gray-700">
+            Después enviá el comprobante por WhatsApp al{" "}
+            <span className="font-semibold">{settings.transferPhone}</span>.
+          </p>
+        </div>
+      )}
 
       <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5 text-left">
         <ul className="flex flex-col gap-2 text-sm">

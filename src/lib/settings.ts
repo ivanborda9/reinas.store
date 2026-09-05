@@ -29,6 +29,9 @@ export async function updateSiteSettings(data: {
   bannerImageUrl: string | null;
   whatsappNumber: string;
   targetMarginPercent: number | null;
+  transferAlias: string;
+  transferHolderName: string;
+  transferPhone: string;
 }) {
   return prisma.siteSettings.upsert({
     where: { id: SETTINGS_ID },

@@ -21,14 +21,14 @@ por cada venta.
 - Carrito de compras (persistido en el navegador)
 - Checkout simplificado: solo pide el **código de revendedora (obligatorio,
   no se puede finalizar la compra sin uno válido, ni desde la interfaz ni
-  llamando a la API directamente)**, una nota opcional del pedido y la
-  elección de medio de pago: **tarjeta/Mercado Pago** (si está configurado)
-  o **efectivo/transferencia** coordinando por WhatsApp. El nombre, teléfono
-  y localidad del pedido se toman automáticamente de los datos de la
+  llamando a la API directamente)** y una nota opcional del pedido. El único
+  medio de pago es **efectivo/transferencia**. El nombre, teléfono y
+  localidad del pedido se toman automáticamente de los datos de la
   revendedora (ya cargados en `/admin/revendedoras`), porque solo compran
   ellas.
-- Confirmación de pedido que muestra el estado real del pago (aprobado,
-  pendiente, rechazado con botón para reintentar) o el botón de WhatsApp
+- Confirmación de pedido ("¡Gracias por tu compra!") que muestra los datos
+  para transferir (alias, titular y el número para enviar el comprobante,
+  configurables en `/admin/configuracion`) y el botón de WhatsApp
 
 **Panel de administración** (`/admin`)
 - Resumen de ventas y comisiones generadas
@@ -165,13 +165,15 @@ por URL y `/admin/banners` queda deshabilitado para subir banners nuevos.
 3. Redeployá el proyecto (o esperá al próximo deploy) para que la variable
    quede disponible.
 
-## Cobrar con tarjeta / Mercado Pago
+## Mercado Pago (integración desactivada en el checkout)
 
-El sitio usa **Checkout Pro** de Mercado Pago: la clienta paga en una
-pantalla de Mercado Pago (vos no manejás datos de tarjeta) y vuelve
-automáticamente al sitio con el resultado. Si no configurás estas
-variables, el checkout simplemente no muestra la opción y sigue
-funcionando solo con WhatsApp — no rompe nada.
+El checkout de la tienda ya **no ofrece pagar con tarjeta/Mercado Pago**:
+el único medio de pago es efectivo/transferencia. La integración con
+Mercado Pago (Checkout Pro) sigue en el código sin usarse en pedidos
+nuevos, solo para poder reintentar el cobro de pedidos viejos que ya se
+habían pagado por esa vía (botón "Reintentar pago" en la confirmación de
+un pedido rechazado). Si en algún momento querés volver a ofrecerlo en el
+checkout, avisame.
 
 1. Entrá a [mercadopago.com.ar/developers/panel](https://www.mercadopago.com.ar/developers/panel)
    con la cuenta de Mercado Pago del negocio (o creá una, es gratis).

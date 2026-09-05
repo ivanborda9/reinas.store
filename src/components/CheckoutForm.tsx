@@ -12,18 +12,13 @@ type CodeState =
   | { status: "valid"; name: string; discountPercent: number }
   | { status: "invalid"; message: string };
 
-type PaymentMethod = "WHATSAPP" | "MERCADOPAGO";
-
-export function CheckoutForm({ mercadoPagoEnabled }: { mercadoPagoEnabled: boolean }) {
+export function CheckoutForm() {
   const { items, subtotal, clear } = useCart();
   const router = useRouter();
 
   const [notes, setNotes] = useState("");
   const [code, setCode] = useState("");
   const [codeState, setCodeState] = useState<CodeState>({ status: "idle" });
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
-    mercadoPagoEnabled ? "MERCADOPAGO" : "WHATSAPP"
-  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,7 +71,7 @@ export function CheckoutForm({ mercadoPagoEnabled }: { mercadoPagoEnabled: boole
         body: JSON.stringify({
           notes,
           resellerCode: code,
-          paymentMethod,
+          paymentMethod: "WHATSAPP",
           items: items.map((i) => ({
             productId: i.productId,
             variantId: i.variantId,
@@ -91,10 +86,6 @@ export function CheckoutForm({ mercadoPagoEnabled }: { mercadoPagoEnabled: boole
         return;
       }
       clear();
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-        return;
-      }
       router.push(`/pedido/${data.orderId}`);
     } catch {
       setError("No se pudo procesar el pedido. Intentá nuevamente.");
@@ -172,48 +163,14 @@ export function CheckoutForm({ mercadoPagoEnabled }: { mercadoPagoEnabled: boole
           />
         </div>
 
-        <div>
-          <span className="mb-2 block text-sm font-medium text-gray-700">¿Cómo querés pagar?</span>
-          <div className="flex flex-col gap-2">
-            {mercadoPagoEnabled && (
-              <label
-                className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${
-                  paymentMethod === "MERCADOPAGO" ? "border-brand-600 bg-brand-50" : "border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  checked={paymentMethod === "MERCADOPAGO"}
-                  onChange={() => setPaymentMethod("MERCADOPAGO")}
-                />
-                <span className="text-sm">
-                  <span className="font-medium text-gray-900">Tarjeta / Mercado Pago</span>
-                  <br />
-                  <span className="text-gray-500">
-                    Pagás ahora online con tarjeta de crédito, débito u otros medios.
-                  </span>
-                </span>
-              </label>
-            )}
-            <label
-              className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${
-                paymentMethod === "WHATSAPP" ? "border-brand-600 bg-brand-50" : "border-gray-300"
-              }`}
-            >
-              <input
-                type="radio"
-                name="paymentMethod"
-                checked={paymentMethod === "WHATSAPP"}
-                onChange={() => setPaymentMethod("WHATSAPP")}
-              />
-              <span className="text-sm">
-                <span className="font-medium text-gray-900">Efectivo / transferencia</span>
-                <br />
-                <span className="text-gray-500">Coordinás el pago y el envío por WhatsApp.</span>
-              </span>
-            </label>
-          </div>
+        <div className="rounded-lg border border-gray-300 px-4 py-3">
+          <span className="text-sm">
+            <span className="font-medium text-gray-900">Forma de pago: efectivo / transferencia</span>
+            <br />
+            <span className="text-gray-500">
+              Después de confirmar el pedido te mostramos los datos para transferir.
+            </span>
+          </span>
         </div>
 
         {error && <p className="text-sm font-medium text-red-600">{error}</p>}
@@ -223,11 +180,7 @@ export function CheckoutForm({ mercadoPagoEnabled }: { mercadoPagoEnabled: boole
           disabled={submitting || codeState.status !== "valid"}
           className="rounded-lg bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700 disabled:bg-gray-300"
         >
-          {submitting
-            ? "Procesando..."
-            : paymentMethod === "MERCADOPAGO"
-              ? "Ir a pagar"
-              : "Confirmar pedido"}
+          {submitting ? "Procesando..." : "Confirmar pedido"}
         </button>
         {codeState.status !== "valid" && (
           <p className="text-xs text-gray-500">
