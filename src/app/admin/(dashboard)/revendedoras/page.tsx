@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
 import { buildCostMap, buildResellerStats } from "@/lib/reports";
-import { toggleResellerActive, toggleResellerDiscountActive, deleteReseller, markCommissionPaid } from "./actions";
+import { toggleResellerActive, toggleResellerDiscountActive, deleteReseller } from "./actions";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 
 export const dynamic = "force-dynamic";
@@ -127,18 +127,6 @@ export default async function AdminResellersPage({
                         {r.discountActive ? "Deshabilitar descuento" : "Habilitar descuento"}
                       </button>
                     </form>
-                    {stats.pendingCommission > 0 && (
-                      <form action={markCommissionPaid.bind(null, r.id)}>
-                        <ConfirmSubmitButton
-                          confirmMessage={`¿Confirmás que ya le pagaste ${formatPrice(
-                            stats.pendingCommission
-                          )} de comisión a ${r.name}? Se va a reiniciar el contador de comisión pendiente.`}
-                          className="text-green-600 hover:underline"
-                        >
-                          Marcar pagada
-                        </ConfirmSubmitButton>
-                      </form>
-                    )}
                     <form action={deleteReseller.bind(null, r.id)}>
                       <ConfirmSubmitButton
                         confirmMessage="¿Eliminar esta revendedora? Si tiene ventas asociadas, se desactivará en su lugar."

@@ -90,7 +90,6 @@ export async function POST(req: NextRequest) {
         ? Math.round(subtotal * (reseller.discountPercent / 100))
         : 0;
       const total = subtotal - discountAmount;
-      const commissionAmount = Math.round(total * (reseller.commissionPercent / 100));
 
       const createdOrder = await tx.order.create({
         data: {
@@ -101,7 +100,6 @@ export async function POST(req: NextRequest) {
           subtotal,
           discountAmount,
           total,
-          commissionAmount,
           resellerId: reseller?.id ?? null,
           paymentMethod,
           items: { create: orderItemsData },

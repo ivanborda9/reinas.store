@@ -5,7 +5,6 @@ type ResellerFormValues = {
   city: string | null;
   code: string;
   discountPercent: number;
-  commissionPercent: number;
 };
 
 export function ResellerForm({
@@ -65,7 +64,7 @@ export function ResellerForm({
         <p className="mt-1 text-xs text-gray-400">Para organizar los envíos de sus pedidos.</p>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Código de descuento</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Código de revendedora</label>
         <input
           name="code"
           required
@@ -74,44 +73,28 @@ export function ResellerForm({
           className="w-full rounded-lg border border-gray-300 px-3 py-2 uppercase"
         />
         <p className="mt-1 text-xs text-gray-400">
-          Este es el código que la revendedora comparte con sus clientas.
+          Es el código que ella usa para comprar en la tienda a precio mayorista.
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Descuento para la clienta (%)
-          </label>
-          <input
-            name="discountPercent"
-            type="number"
-            min={0}
-            max={100}
-            step="0.1"
-            required
-            defaultValue={initial?.discountPercent}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Comisión para la revendedora (%)
-          </label>
-          <input
-            name="commissionPercent"
-            type="number"
-            min={0}
-            max={100}
-            step="0.1"
-            required
-            defaultValue={initial?.commissionPercent}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
-          />
-        </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Descuento mayorista para ella (%)
+        </label>
+        <input
+          name="discountPercent"
+          type="number"
+          min={0}
+          max={100}
+          step="0.1"
+          required
+          defaultValue={initial?.discountPercent}
+          className="w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2"
+        />
+        <p className="mt-1 text-xs text-gray-400">
+          Lo que paga de menos al comprar con su código. Ella después revende cada prenda al precio
+          que quiera: la diferencia es su ganancia, y no la vemos ni la manejamos nosotros.
+        </p>
       </div>
-      <p className="text-xs text-gray-400">
-        La comisión se calcula sobre el total de la venta ya con el descuento aplicado.
-      </p>
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           {hasPassword ? "Nueva contraseña para su panel (opcional)" : "Contraseña para su panel (opcional)"}
@@ -124,8 +107,8 @@ export function ResellerForm({
           className="w-full rounded-lg border border-gray-300 px-3 py-2"
         />
         <p className="mt-1 text-xs text-gray-400">
-          Con email y esta contraseña, la revendedora puede entrar a /revendedora/login a ver sus
-          ventas y comisión.
+          Con email y esta contraseña, la revendedora puede entrar a /revendedora/login a ver su
+          historial de compras.
         </p>
       </div>
       <button

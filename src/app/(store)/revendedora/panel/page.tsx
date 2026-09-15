@@ -16,11 +16,7 @@ export default async function RevendedoraPanelPage() {
   });
 
   const activeOrders = orders.filter((o) => o.status !== "CANCELADO");
-  const totalVentas = activeOrders.reduce((sum, o) => sum + o.total, 0);
-  const comisionAcumulada = activeOrders.reduce((sum, o) => sum + o.commissionAmount, 0);
-  const comisionPendiente = activeOrders
-    .filter((o) => !reseller.lastPayoutAt || o.createdAt > reseller.lastPayoutAt)
-    .reduce((sum, o) => sum + o.commissionAmount, 0);
+  const totalCompras = activeOrders.reduce((sum, o) => sum + o.total, 0);
 
   return (
     <div className="mx-auto max-w-3xl py-8">
@@ -46,39 +42,28 @@ export default async function RevendedoraPanelPage() {
       )}
       {reseller.active && !reseller.discountActive && (
         <p className="mb-6 rounded-lg bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-          El descuento para tus clientas está deshabilitado temporalmente por el administrador.
-          Tu código sigue funcionando y sigue generando tu comisión, solo que sin descuento por
-          ahora.
+          Tu descuento para comprar a precio mayorista está deshabilitado temporalmente por el
+          administrador. Tu código sigue funcionando, solo que sin descuento por ahora.
         </p>
       )}
 
-      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4">
         <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Ventas generadas</p>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Compras realizadas</p>
           <p className="mt-1 text-xl font-bold text-gray-900">{activeOrders.length}</p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Monto vendido</p>
-          <p className="mt-1 text-xl font-bold text-gray-900">{formatPrice(totalVentas)}</p>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Comisión desde el primer día</p>
-          <p className="mt-1 text-xl font-bold text-gray-900">{formatPrice(comisionAcumulada)}</p>
-        </div>
-        <div className="rounded-xl border border-brand-200 bg-brand-50 p-4">
-          <p className="text-xs uppercase tracking-wide text-brand-700">
-            Comisión pendiente {reseller.lastPayoutAt ? `(desde ${formatDate(reseller.lastPayoutAt)})` : ""}
-          </p>
-          <p className="mt-1 text-xl font-bold text-brand-700">{formatPrice(comisionPendiente)}</p>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Monto comprado</p>
+          <p className="mt-1 text-xl font-bold text-gray-900">{formatPrice(totalCompras)}</p>
         </div>
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <h2 className="mb-3 font-bold text-gray-900">Tus ventas</h2>
+        <h2 className="mb-3 font-bold text-gray-900">Tus compras</h2>
         {orders.length === 0 ? (
           <p className="text-sm text-gray-500">
-            Todavía no tenés ventas. Compartí tu código <strong>{reseller.code}</strong> con tus
-            clientas para que lo usen en el checkout.
+            Todavía no compraste nada. Usá tu código <strong>{reseller.code}</strong> en el checkout
+            cuando quieras comprar a precio mayorista para revender.
           </p>
         ) : (
           <ul className="flex flex-col divide-y divide-gray-100 text-sm">
@@ -93,8 +78,7 @@ export default async function RevendedoraPanelPage() {
                 <div className="text-right">
                   <p className="font-semibold">{formatPrice(o.total)}</p>
                   <p className="text-xs text-gray-500">
-                    {ORDER_STATUS_LABELS[o.status as OrderStatus] ?? o.status} · comisión{" "}
-                    {formatPrice(o.commissionAmount)}
+                    {ORDER_STATUS_LABELS[o.status as OrderStatus] ?? o.status}
                   </p>
                 </div>
               </li>

@@ -124,7 +124,6 @@ export async function registerManualSale(formData: FormData) {
           subtotal,
           discountAmount: 0,
           total: subtotal,
-          commissionAmount: 0,
           status: "CONFIRMADO",
           paymentMethod: "MOSTRADOR",
           items: { create: orderItemsData },

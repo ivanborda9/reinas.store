@@ -15,19 +15,18 @@ export function orderCost(
 }
 
 /**
- * Ganancia neta de un pedido: total cobrado (ya con descuento aplicado) menos
- * el costo de los productos vendidos (0 para los que no tienen costo cargado)
- * menos la comisión pagada a la revendedora.
+ * Ganancia neta de un pedido: total cobrado (ya con el descuento de la
+ * revendedora aplicado) menos el costo de los productos vendidos (0 para los
+ * que no tienen costo cargado).
  */
 export function orderNetProfit(
   order: {
     total: number;
-    commissionAmount: number;
     items: { productId: string; quantity: number }[];
   },
   costByProductId: CostMap
 ): number {
-  return order.total - orderCost(order.items, costByProductId) - order.commissionAmount;
+  return order.total - orderCost(order.items, costByProductId);
 }
 
 export function startOfDay(date: Date): Date {
@@ -84,25 +83,20 @@ export function revenueWeightedMarginPercent(
 type OrderForStats = {
   status: string;
   total: number;
-  commissionAmount: number;
   createdAt: Date;
   resellerId: string | null;
   items: { productId: string; productName: string; price: number; quantity: number }[];
 };
 
 export function buildResellerStats(
-  reseller: { id: string; lastPayoutAt: Date | null },
+  reseller: { id: string },
   orders: OrderForStats[],
   costMap: CostMap
 ) {
   const active = orders.filter((o) => o.resellerId === reseller.id && o.status !== "CANCELADO");
   const salesCount = active.length;
   const totalSales = active.reduce((sum, o) => sum + o.total, 0);
-  const commissionEarned = active.reduce((sum, o) => sum + o.commissionAmount, 0);
   const netProfitGenerated = active.reduce((sum, o) => sum + orderNetProfit(o, costMap), 0);
-  const pendingCommission = active
-    .filter((o) => !reseller.lastPayoutAt || o.createdAt > reseller.lastPayoutAt)
-    .reduce((sum, o) => sum + o.commissionAmount, 0);
 
   const productAgg = new Map<string, { name: string; quantity: number; revenue: number }>();
   for (const o of active) {
@@ -119,5 +113,5 @@ export function buildResellerStats(
   }
   const products = Array.from(productAgg.values()).sort((a, b) => b.quantity - a.quantity);
 
-  return { salesCount, totalSales, commissionEarned, netProfitGenerated, pendingCommission, products };
+  return { salesCount, totalSales, netProfitGenerated, products };
 }

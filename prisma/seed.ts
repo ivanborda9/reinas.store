@@ -607,7 +607,6 @@ const resellers = [
     phone: "+54 9 11 1111-1111",
     code: "ANA10",
     discountPercent: 10,
-    commissionPercent: 15,
   },
   {
     name: "Belén Ríos",
@@ -615,7 +614,6 @@ const resellers = [
     phone: "+54 9 11 2222-2222",
     code: "BELEN15",
     discountPercent: 15,
-    commissionPercent: 12,
   },
 ];
 

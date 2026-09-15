@@ -1,19 +1,14 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDate, formatVariantLabel, ORDER_STATUSES, ORDER_STATUS_LABELS } from "@/lib/format";
-import { getAdminRole } from "@/lib/adminSession";
 import { updateOrderStatus } from "../actions";
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
-  const [order, role] = await Promise.all([
-    prisma.order.findUnique({
-      where: { id: params.id },
-      include: { items: true, reseller: true },
-    }),
-    getAdminRole(),
-  ]);
+  const order = await prisma.order.findUnique({
+    where: { id: params.id },
+    include: { items: true, reseller: true },
+  });
   if (!order) notFound();
-  const isOwner = role === "owner";
 
   return (
     <div className="max-w-2xl">
@@ -39,11 +34,6 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
               </p>
               {order.reseller.phone && <p className="text-sm text-gray-700">{order.reseller.phone}</p>}
               {order.reseller.city && <p className="text-sm text-gray-700">{order.reseller.city}</p>}
-              {isOwner && (
-                <p className="text-sm text-gray-700">
-                  Comisión: {formatPrice(order.commissionAmount)} ({order.reseller.commissionPercent}%)
-                </p>
-              )}
             </>
           ) : (
             <p className="text-sm text-gray-500">Venta directa, sin revendedora.</p>

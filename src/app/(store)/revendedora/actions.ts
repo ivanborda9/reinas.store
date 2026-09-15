@@ -60,7 +60,6 @@ export async function registerReseller(formData: FormData) {
         code,
         passwordHash,
         discountPercent: 0,
-        commissionPercent: 0,
         active: false,
       },
     });

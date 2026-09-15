@@ -53,19 +53,17 @@ model ProductImage {
 }
 
 model Reseller {
-  id                String   @id @default(cuid())
-  name              String
-  email             String?  @unique
-  phone             String?
-  city              String?
-  code              String   @unique
-  passwordHash      String?
-  discountPercent   Float    @default(10)
-  commissionPercent Float    @default(15)
-  active            Boolean  @default(true)
-  discountActive    Boolean  @default(true)
-  lastPayoutAt      DateTime?
-  createdAt         DateTime @default(now())
+  id              String   @id @default(cuid())
+  name            String
+  email           String?  @unique
+  phone           String?
+  city            String?
+  code            String   @unique
+  passwordHash    String?
+  discountPercent Float    @default(10)
+  active          Boolean  @default(true)
+  discountActive  Boolean  @default(true)
+  createdAt       DateTime @default(now())
 
   orders Order[]
 }
@@ -97,19 +95,18 @@ model Banner {
 }
 
 model Order {
-  id               String   @id @default(cuid())
-  customerName     String
-  customerPhone    String
-  customerAddress  String
-  notes            String?
-  subtotal         Float
-  discountAmount   Float    @default(0)
-  total            Float
-  commissionAmount Float    @default(0)
-  resellerId       String?
-  reseller         Reseller? @relation(fields: [resellerId], references: [id])
-  status           String   @default("PENDIENTE")
-  createdAt        DateTime @default(now())
+  id              String    @id @default(cuid())
+  customerName    String
+  customerPhone   String
+  customerAddress String
+  notes           String?
+  subtotal        Float
+  discountAmount  Float     @default(0)
+  total           Float
+  resellerId      String?
+  reseller        Reseller? @relation(fields: [resellerId], references: [id])
+  status          String    @default("PENDIENTE")
+  createdAt       DateTime  @default(now())
 
   paymentMethod    String   @default("WHATSAPP") // WHATSAPP | MERCADOPAGO
   paymentStatus    String   @default("PENDIENTE") // PENDIENTE | APROBADO | RECHAZADO

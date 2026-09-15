@@ -15,7 +15,6 @@ function parseResellerForm(formData: FormData) {
       .trim()
       .toUpperCase(),
     discountPercent: Number(formData.get("discountPercent") || 0),
-    commissionPercent: Number(formData.get("commissionPercent") || 0),
     password: String(formData.get("password") || ""),
   };
 }
@@ -60,11 +59,6 @@ export async function toggleResellerActive(id: string, active: boolean) {
 
 export async function toggleResellerDiscountActive(id: string, discountActive: boolean) {
   await prisma.reseller.update({ where: { id }, data: { discountActive } });
-  revalidatePath("/admin/revendedoras");
-}
-
-export async function markCommissionPaid(id: string) {
-  await prisma.reseller.update({ where: { id }, data: { lastPayoutAt: new Date() } });
   revalidatePath("/admin/revendedoras");
 }
 

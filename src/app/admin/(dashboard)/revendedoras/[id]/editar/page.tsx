@@ -19,7 +19,6 @@ export default async function EditResellerPage({ params }: { params: { id: strin
           city: reseller.city,
           code: reseller.code,
           discountPercent: reseller.discountPercent,
-          commissionPercent: reseller.commissionPercent,
         }}
         submitLabel="Guardar cambios"
         hasPassword={Boolean(reseller.passwordHash)}

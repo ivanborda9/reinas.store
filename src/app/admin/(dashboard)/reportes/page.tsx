@@ -177,9 +177,9 @@ export default async function AdminReportsPage({
       <h1 className="mb-1 text-2xl font-bold text-gray-900">Reportes</h1>
       <p className="mb-6 text-sm text-gray-500">
         La ganancia neta se calcula como ventas − costo de los productos (según el precio de
-        costo cargado en cada uno; los que no tienen costo cargado se cuentan sin costo) −
-        comisión pagada a la revendedora. Las ventas registradas como "Venta directa" (mostrador)
-        no se incluyen en estos números: solo se usan para descontar stock.
+        costo cargado en cada uno; los que no tienen costo cargado se cuentan sin costo). Las
+        ventas registradas como "Venta directa" (mostrador) no se incluyen en estos números: solo
+        se usan para descontar stock.
       </p>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">

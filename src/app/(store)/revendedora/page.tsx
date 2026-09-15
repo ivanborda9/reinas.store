@@ -5,8 +5,8 @@ export default function RevendedoraLandingPage() {
     <div className="mx-auto max-w-2xl py-10 text-center">
       <h1 className="text-3xl font-bold text-gray-900">¿Querés ser revendedora?</h1>
       <p className="mt-3 text-gray-600">
-        Sumate con tu propio código de descuento: tus clientas compran más barato y vos ganás una
-        comisión por cada venta que hagan con tu código.
+        Sumate con tu propio código: comprás las prendas a precio mayorista y las revendés al
+        precio que vos quieras. La diferencia es tu ganancia.
       </p>
 
       <div className="mt-8 grid gap-4 text-left sm:grid-cols-3">
@@ -17,13 +17,14 @@ export default function RevendedoraLandingPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-2xl font-bold text-brand-600">2</p>
           <p className="mt-1 text-sm text-gray-700">
-            Recibís tu código de descuento propio para compartir.
+            Recibís tu código propio para comprar a precio mayorista.
           </p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-2xl font-bold text-brand-600">3</p>
           <p className="mt-1 text-sm text-gray-700">
-            Ingresá a tu panel cuando quieras para ver tus ventas y tu comisión acumulada.
+            Le mostrás la prenda a tu clienta, le ponés el precio que quieras y comprás en la
+            página cuando ya tengas la venta hecha.
           </p>
         </div>
       </div>

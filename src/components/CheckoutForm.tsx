@@ -59,7 +59,7 @@ export function CheckoutForm() {
     setError(null);
 
     if (codeState.status !== "valid") {
-      setError("Ingresá y validá el código de tu revendedora para poder finalizar la compra.");
+      setError("Ingresá y validá tu código de revendedora para poder finalizar la compra.");
       return;
     }
 
@@ -111,7 +111,7 @@ export function CheckoutForm() {
 
         <div className="rounded-lg border border-brand-200 bg-brand-50 p-4">
           <label className="mb-1 block text-sm font-medium text-brand-800">
-            Código de tu revendedora (obligatorio)
+            Tu código de revendedora (obligatorio)
           </label>
           <div className="flex gap-2">
             <input
@@ -133,7 +133,7 @@ export function CheckoutForm() {
             </button>
           </div>
           <p className="mt-2 text-xs text-brand-700">
-            Necesitás el código de una revendedora para poder finalizar la compra.
+            Ingresá tu código de revendedora para comprar a precio mayorista.
           </p>
           {codeState.status === "checking" && (
             <p className="mt-2 text-sm text-brand-700">Validando...</p>
@@ -142,7 +142,7 @@ export function CheckoutForm() {
             <p className="mt-2 text-sm font-medium text-green-700">
               {codeState.discountPercent > 0
                 ? `¡Código de ${codeState.name} aplicado! ${codeState.discountPercent}% de descuento.`
-                : `Código de ${codeState.name} aplicado. Por el momento no tiene descuento para la clienta.`}
+                : `Código de ${codeState.name} aplicado. Por el momento no tenés descuento aplicado.`}
             </p>
           )}
           {codeState.status === "invalid" && (
@@ -184,7 +184,7 @@ export function CheckoutForm() {
         </button>
         {codeState.status !== "valid" && (
           <p className="text-xs text-gray-500">
-            Validá el código de tu revendedora arriba para poder continuar.
+            Validá tu código de revendedora arriba para poder continuar.
           </p>
         )}
       </form>

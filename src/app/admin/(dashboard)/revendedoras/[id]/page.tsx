@@ -41,10 +41,9 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
         </Link>
       </div>
 
-      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <StatCard label="Ventas" value={String(stats.salesCount)} />
         <StatCard label="Monto vendido" value={formatPrice(stats.totalSales)} />
-        <StatCard label="Comisión ganada" value={formatPrice(stats.commissionEarned)} />
         <StatCard label="Ganancia generada" value={formatPrice(stats.netProfitGenerated)} highlight />
       </div>
 

@@ -9,7 +9,7 @@ export default function LoginRevendedoraPage({
   return (
     <div className="mx-auto max-w-md py-10">
       <h1 className="mb-1 text-2xl font-bold text-gray-900">Ingresá a tu panel</h1>
-      <p className="mb-6 text-sm text-gray-500">Revisá tus ventas y tu comisión acumulada.</p>
+      <p className="mb-6 text-sm text-gray-500">Revisá tu historial de compras a precio mayorista.</p>
 
       {searchParams.error && (
         <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">

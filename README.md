@@ -1,9 +1,12 @@
 # Catálogo de ropa con revendedoras
 
-Sitio de venta de ropa por catálogo con carrito de compras y un sistema de
-códigos de descuento para revendedoras: cada revendedora tiene un código
-propio que le da un descuento a sus clientas y le genera a ella una comisión
-por cada venta.
+Sitio de venta de ropa por catálogo para revendedoras: cada una tiene un
+código propio que le da un descuento (precio mayorista) para comprar en la
+tienda. Ella le muestra la prenda a su clienta por su cuenta (WhatsApp,
+Instagram, etc.), le pone el precio que quiera, y cuando cierra la venta
+entra a la página y compra el artículo con su código para después
+entregarlo. La diferencia entre lo que paga acá y lo que le cobra a su
+clienta es su ganancia; el sitio no la calcula ni la necesita saber.
 
 ## Stack
 
@@ -19,19 +22,19 @@ por cada venta.
   variantes, un listado de **color** y otro de **talle** (cuando corresponda)
   que se filtran entre sí y muestran sin stock las combinaciones agotadas
 - Carrito de compras (persistido en el navegador)
-- Checkout simplificado: solo pide el **código de revendedora (obligatorio,
-  no se puede finalizar la compra sin uno válido, ni desde la interfaz ni
-  llamando a la API directamente)** y una nota opcional del pedido. El único
-  medio de pago es **efectivo/transferencia**. El nombre, teléfono y
-  localidad del pedido se toman automáticamente de los datos de la
-  revendedora (ya cargados en `/admin/revendedoras`), porque solo compran
-  ellas.
+- Checkout simplificado: solo pide su **propio código de revendedora
+  (obligatorio, no se puede finalizar la compra sin uno válido, ni desde la
+  interfaz ni llamando a la API directamente)** y una nota opcional del
+  pedido. El único medio de pago es **efectivo/transferencia**. El nombre,
+  teléfono y localidad del pedido se toman automáticamente de los datos de
+  la revendedora (ya cargados en `/admin/revendedoras`), porque quien compra
+  siempre es ella.
 - Confirmación de pedido ("¡Gracias por tu compra!") que muestra los datos
   para transferir (alias, titular y el número para enviar el comprobante,
   configurables en `/admin/configuracion`) y el botón de WhatsApp
 
 **Panel de administración** (`/admin`)
-- Resumen de ventas y comisiones generadas
+- Resumen de ventas y ganancias generadas
 - ABM de productos (nombre, precio, stock, categoría, imagen, alta/baja).
   Opcionalmente se le pueden cargar **variantes de color y/o talle**, cada
   una con su propio stock; si un producto tiene variantes, el stock general
@@ -44,27 +47,22 @@ por cada venta.
 - **Categorías** (`/admin/categorias`): crear o eliminar las categorías que después
   se eligen al cargar un producto y que aparecen como filtro en el catálogo. No
   se puede eliminar una categoría que todavía tiene productos cargados.
-- ABM de revendedoras: código de descuento, % de descuento para la clienta,
-  % de comisión y contraseña opcional para su panel. Al registrarse solas
-  desde `/revendedora/registro` tanto el descuento para la clienta como la
-  comisión arrancan en **0%**, y el admin les asigna los valores reales
-  desde "Editar" al aprobarlas. La lista muestra la
-  comisión total histórica y la comisión pendiente (desde el último pago);
-  el botón **"Marcar pagada"** registra la fecha de pago y reinicia el
-  contador de pendiente a $0, sin borrar el historial de ventas. También se
-  puede **habilitar/deshabilitar el descuento para la clienta** de forma
+- ABM de revendedoras: código, % de descuento mayorista (lo que paga de
+  menos al comprar) y contraseña opcional para su panel. Al registrarse
+  solas desde `/revendedora/registro` el descuento arranca en **0%**, y el
+  admin le asigna el valor real desde "Editar" al aprobarla. También se
+  puede **habilitar/deshabilitar su descuento mayorista** de forma
   independiente de la cuenta y del código: si se deshabilita, el código
-  sigue funcionando y sigue generando comisión para la revendedora, solo
-  que sin aplicarle descuento a la compra. El listado se puede **ordenar
-  por más ventas, más ganancia generada o localidad**, y cada nombre lleva
-  a una **página de detalle** con sus artículos vendidos, monto total y
-  ganancia generada para el negocio
+  sigue funcionando para comprar, solo que sin descuento. El listado se
+  puede **ordenar por más ventas, más ganancia generada o localidad**, y
+  cada nombre lleva a una **página de detalle** con los artículos que
+  compró, el monto total y la ganancia que le generó al negocio
 - **Reportes** (`/admin/reportes`): ventas y ganancia neta de hoy, los
   últimos 7 y 30 días, tabla de ventas por día (últimas 2 semanas) y por
   mes, ranking de productos más vendidos y ranking de revendedoras por
   ganancia generada. La ganancia neta = ventas − costo de los productos
-  vendidos (usando el precio de costo cargado en cada uno) − comisión
-  pagada a la revendedora. También muestra el **margen de ganancia
+  vendidos (usando el precio de costo cargado en cada uno). También muestra
+  el **margen de ganancia
   promedio de los productos activos** (precio vs. costo) y el **margen de
   ganancia promedio de las ventas** realizadas hasta el momento, con la
   opción de verlo por día, semana o mes. Ambos solo tienen en cuenta los
@@ -83,15 +81,14 @@ por cada venta.
 - Página pública "¿Querés ser revendedora?" con botones para registrarse o
   iniciar sesión
 - Registro con nombre, email, teléfono, localidad y contraseña: genera un
-  código de descuento único y queda **pendiente de aprobación** (el admin la
-  activa desde `/admin/revendedoras`). La localidad se muestra en el listado
-  de admin para organizar los envíos
-- Panel propio (`/revendedora/panel`) donde cada revendedora ve su código,
-  sus ventas, la comisión acumulada desde el primer día y la comisión
-  pendiente desde el último pago que le registró el admin
+  código único y queda **pendiente de aprobación** (el admin la activa desde
+  `/admin/revendedoras`). La localidad se muestra en el listado de admin
+  para organizar los envíos
+- Panel propio (`/revendedora/panel`) donde cada revendedora ve su código y
+  su historial de compras a precio mayorista
 
-El descuento se calcula sobre el subtotal del pedido; la comisión de la
-revendedora se calcula sobre el total ya con el descuento aplicado.
+El descuento mayorista se calcula sobre el subtotal del pedido que hace la
+revendedora al comprar con su código.
 
 ## Cómo correrlo localmente
 
@@ -136,11 +133,10 @@ visual (con buscador), su variante de color/talle si tiene, y la cantidad,
 así el stock se descuenta correctamente. Estas ventas de mostrador quedan
 registradas en Pedidos pero **no suman a "Ventas totales" ni "Ganancias
 netas" ni a ningún número de Reportes**: solo sirven para descontar
-stock. No puede ver ni acceder a Resumen,
-Reportes, Productos, Categorías, Revendedoras, Banners ni Configuración, y en
-el detalle de un pedido no ve la comisión de la revendedora. Tampoco puede
-eliminar pedidos cancelados. Si dejás esas dos variables vacías, ese acceso
-directamente no existe.
+stock. No puede ver ni acceder a Resumen, Reportes, Productos, Categorías,
+Revendedoras, Banners ni Configuración. Tampoco puede eliminar pedidos
+cancelados. Si dejás esas dos variables vacías, ese acceso directamente no
+existe.
 
 ## Cargar tus propios productos
 

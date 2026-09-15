@@ -16,7 +16,6 @@ export default function NewResellerPage({ searchParams }: { searchParams: { erro
           city: "",
           code: "",
           discountPercent: 10,
-          commissionPercent: 15,
         }}
       />
     </div>
