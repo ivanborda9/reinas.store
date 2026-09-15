@@ -15,8 +15,11 @@ export default async function AdminDashboardPage() {
 
   const costMap = buildCostMap(products);
   const activeOrders = orders.filter((o) => o.status !== "CANCELADO");
-  const totalSales = activeOrders.reduce((sum, o) => sum + o.total, 0);
-  const totalNetProfit = activeOrders.reduce((sum, o) => sum + orderNetProfit(o, costMap), 0);
+  // Las ventas de mostrador ("MOSTRADOR") solo se registran para descontar stock:
+  // no cuentan como ventas ni ganancias de la página.
+  const trackedSalesOrders = activeOrders.filter((o) => o.paymentMethod !== "MOSTRADOR");
+  const totalSales = trackedSalesOrders.reduce((sum, o) => sum + o.total, 0);
+  const totalNetProfit = trackedSalesOrders.reduce((sum, o) => sum + orderNetProfit(o, costMap), 0);
   const recentOrders = orders.slice(0, 8);
 
   const todayStart = startOfDay(new Date());

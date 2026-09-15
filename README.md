@@ -133,7 +133,10 @@ también entran por `/admin/login`, pero con acceso limitado únicamente a
 enviado, entregado, etc) y registrar ventas hechas en persona desde
 "+ Registrar venta", eligiendo los productos con foto desde un catálogo
 visual (con buscador), su variante de color/talle si tiene, y la cantidad,
-así el stock se descuenta correctamente. No puede ver ni acceder a Resumen,
+así el stock se descuenta correctamente. Estas ventas de mostrador quedan
+registradas en Pedidos pero **no suman a "Ventas totales" ni "Ganancias
+netas" ni a ningún número de Reportes**: solo sirven para descontar
+stock. No puede ver ni acceder a Resumen,
 Reportes, Productos, Categorías, Revendedoras, Banners ni Configuración, y en
 el detalle de un pedido no ve la comisión de la revendedora. Tampoco puede
 eliminar pedidos cancelados. Si dejás esas dos variables vacías, ese acceso

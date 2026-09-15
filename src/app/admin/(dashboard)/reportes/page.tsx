@@ -29,7 +29,7 @@ export default async function AdminReportsPage({
 }) {
   const [orders, products, settings] = await Promise.all([
     prisma.order.findMany({
-      where: { status: { not: "CANCELADO" } },
+      where: { status: { not: "CANCELADO" }, paymentMethod: { not: "MOSTRADOR" } },
       include: { items: true, reseller: true },
       orderBy: { createdAt: "desc" },
     }),
@@ -178,7 +178,8 @@ export default async function AdminReportsPage({
       <p className="mb-6 text-sm text-gray-500">
         La ganancia neta se calcula como ventas − costo de los productos (según el precio de
         costo cargado en cada uno; los que no tienen costo cargado se cuentan sin costo) −
-        comisión pagada a la revendedora.
+        comisión pagada a la revendedora. Las ventas registradas como "Venta directa" (mostrador)
+        no se incluyen en estos números: solo se usan para descontar stock.
       </p>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
