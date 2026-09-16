@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentReseller } from "@/lib/resellerSession";
 import { formatPrice, formatDate, ORDER_STATUS_LABELS, OrderStatus } from "@/lib/format";
+import { buildRewardProgress } from "@/lib/reports";
 import { logoutReseller } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -10,13 +11,17 @@ export default async function RevendedoraPanelPage() {
   const reseller = await getCurrentReseller();
   if (!reseller) redirect("/revendedora/login");
 
-  const orders = await prisma.order.findMany({
-    where: { resellerId: reseller.id },
-    orderBy: { createdAt: "desc" },
-  });
+  const [orders, tiers] = await Promise.all([
+    prisma.order.findMany({
+      where: { resellerId: reseller.id },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.rewardTier.findMany({ where: { active: true } }),
+  ]);
 
   const activeOrders = orders.filter((o) => o.status !== "CANCELADO");
   const totalCompras = activeOrders.reduce((sum, o) => sum + o.total, 0);
+  const rewardProgress = buildRewardProgress(totalCompras, tiers);
 
   return (
     <div className="mx-auto max-w-3xl py-8">
@@ -57,6 +62,37 @@ export default async function RevendedoraPanelPage() {
           <p className="mt-1 text-xl font-bold text-gray-900">{formatPrice(totalCompras)}</p>
         </div>
       </div>
+
+      {rewardProgress.length > 0 && (
+        <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 font-bold text-gray-900">Regalos</h2>
+          <ul className="flex flex-col gap-4">
+            {rewardProgress.map((tier) => (
+              <li key={tier.id}>
+                <div className="mb-1 flex items-center justify-between text-sm">
+                  <span className="font-medium text-gray-900">{tier.title}</span>
+                  {tier.achieved ? (
+                    <span className="font-semibold text-green-600">¡Cumplido!</span>
+                  ) : (
+                    <span className="text-gray-500">
+                      Te faltan {formatPrice(tier.remaining)} de {formatPrice(tier.targetAmount)}
+                    </span>
+                  )}
+                </div>
+                {tier.description && (
+                  <p className="mb-1 text-xs text-gray-500">{tier.description}</p>
+                )}
+                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className={`h-full rounded-full ${tier.achieved ? "bg-green-500" : "bg-brand-500"}`}
+                    style={{ width: `${tier.progressPercent}%` }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-3 font-bold text-gray-900">Tus compras</h2>

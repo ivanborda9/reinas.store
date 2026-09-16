@@ -115,3 +115,23 @@ export function buildResellerStats(
 
   return { salesCount, totalSales, netProfitGenerated, products };
 }
+
+/**
+ * Progreso de una revendedora sobre cada regalo, según el total comprado
+ * (`totalSales`) contra el monto objetivo de cada uno. Ordenado por monto
+ * objetivo ascendente.
+ */
+export function buildRewardProgress(
+  totalSales: number,
+  tiers: { id: string; title: string; description: string | null; targetAmount: number }[]
+) {
+  return tiers
+    .slice()
+    .sort((a, b) => a.targetAmount - b.targetAmount)
+    .map((tier) => ({
+      ...tier,
+      achieved: totalSales >= tier.targetAmount,
+      remaining: Math.max(0, tier.targetAmount - totalSales),
+      progressPercent: Math.min(100, (totalSales / tier.targetAmount) * 100),
+    }));
+}

@@ -56,7 +56,15 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   sigue funcionando para comprar, solo que sin descuento. El listado se
   puede **ordenar por más ventas, más ganancia generada o localidad**, y
   cada nombre lleva a una **página de detalle** con los artículos que
-  compró, el monto total y la ganancia que le generó al negocio
+  compró, el monto total, la ganancia que le generó al negocio y su
+  progreso en los regalos (ver más abajo)
+- **Regalos** (`/admin/regalos`): sistema de premios por objetivo de ventas.
+  Cada regalo tiene un nombre, una descripción opcional y un monto objetivo;
+  se puede editar, desactivar o eliminar en cualquier momento. El objetivo
+  se compara contra el total comprado por cada revendedora (sin contar
+  pedidos cancelados), sin distinguir por período: es acumulado desde
+  siempre. El listado muestra cuántas revendedoras activas ya cumplieron
+  cada uno
 - **Reportes** (`/admin/reportes`): ventas y ganancia neta de hoy, los
   últimos 7 y 30 días, tabla de ventas por día (últimas 2 semanas) y por
   mes, ranking de productos más vendidos y ranking de revendedoras por
@@ -84,8 +92,10 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   código único y queda **pendiente de aprobación** (el admin la activa desde
   `/admin/revendedoras`). La localidad se muestra en el listado de admin
   para organizar los envíos
-- Panel propio (`/revendedora/panel`) donde cada revendedora ve su código y
-  su historial de compras a precio mayorista
+- Panel propio (`/revendedora/panel`) donde cada revendedora ve su código,
+  su historial de compras a precio mayorista y su progreso en los
+  **regalos** activos (monto que le falta o que ya cumplió), cargados por
+  el admin en `/admin/regalos`
 
 El descuento mayorista se calcula sobre el subtotal del pedido que hace la
 revendedora al comprar con su código.

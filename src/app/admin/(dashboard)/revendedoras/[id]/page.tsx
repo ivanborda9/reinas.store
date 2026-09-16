@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDate, ORDER_STATUS_LABELS, OrderStatus } from "@/lib/format";
-import { buildCostMap, buildResellerStats } from "@/lib/reports";
+import { buildCostMap, buildResellerStats, buildRewardProgress } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -10,17 +10,19 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
   const reseller = await prisma.reseller.findUnique({ where: { id: params.id } });
   if (!reseller) notFound();
 
-  const [orders, products] = await Promise.all([
+  const [orders, products, tiers] = await Promise.all([
     prisma.order.findMany({
       where: { resellerId: reseller.id },
       include: { items: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.product.findMany({ select: { id: true, costPrice: true } }),
+    prisma.rewardTier.findMany({ where: { active: true } }),
   ]);
 
   const costMap = buildCostMap(products);
   const stats = buildResellerStats(reseller, orders, costMap);
+  const rewardProgress = buildRewardProgress(stats.totalSales, tiers);
 
   return (
     <div>
@@ -46,6 +48,34 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
         <StatCard label="Monto vendido" value={formatPrice(stats.totalSales)} />
         <StatCard label="Ganancia generada" value={formatPrice(stats.netProfitGenerated)} highlight />
       </div>
+
+      {rewardProgress.length > 0 && (
+        <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 font-bold text-gray-900">Regalos</h2>
+          <ul className="flex flex-col gap-4">
+            {rewardProgress.map((tier) => (
+              <li key={tier.id}>
+                <div className="mb-1 flex items-center justify-between text-sm">
+                  <span className="font-medium text-gray-900">{tier.title}</span>
+                  {tier.achieved ? (
+                    <span className="font-semibold text-green-600">Cumplido</span>
+                  ) : (
+                    <span className="text-gray-500">
+                      Faltan {formatPrice(tier.remaining)} de {formatPrice(tier.targetAmount)}
+                    </span>
+                  )}
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className={`h-full rounded-full ${tier.achieved ? "bg-green-500" : "bg-brand-500"}`}
+                    style={{ width: `${tier.progressPercent}%` }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-3 font-bold text-gray-900">Artículos vendidos</h2>

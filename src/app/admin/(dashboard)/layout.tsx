@@ -8,6 +8,7 @@ const ownerLinks = [
   { href: "/admin/productos", label: "Productos" },
   { href: "/admin/categorias", label: "Categorías" },
   { href: "/admin/revendedoras", label: "Revendedoras" },
+  { href: "/admin/regalos", label: "Regalos" },
   { href: "/admin/pedidos", label: "Pedidos" },
   { href: "/admin/banners", label: "Banners" },
   { href: "/admin/configuracion", label: "Configuración" },

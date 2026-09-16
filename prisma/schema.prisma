@@ -83,6 +83,15 @@ model SiteSettings {
   updatedAt           DateTime @updatedAt
 }
 
+model RewardTier {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  targetAmount Float
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
 model Banner {
   id        String   @id @default(cuid())
   imageUrl  String
