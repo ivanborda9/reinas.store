@@ -58,6 +58,44 @@ export function weekKey(date: Date): string {
   return dayKey(d);
 }
 
+// Argentina no tiene horario de verano: siempre UTC-3. Estas funciones calculan
+// el lunes (hora Argentina) de la semana de un instante sin depender de la
+// zona horaria del proceso (en producción corre en UTC), para el sistema de
+// premios semanales.
+const ARGENTINA_OFFSET_MS = 3 * 60 * 60 * 1000;
+
+/** Lunes 00:00 (hora Argentina) de la semana que contiene `date`, como instante real. */
+export function argentinaWeekStart(date: Date): Date {
+  const wall = new Date(date.getTime() - ARGENTINA_OFFSET_MS);
+  const diffToMonday = (wall.getUTCDay() + 6) % 7;
+  const mondayWallMidnight = Date.UTC(
+    wall.getUTCFullYear(),
+    wall.getUTCMonth(),
+    wall.getUTCDate() - diffToMonday
+  );
+  return new Date(mondayWallMidnight + ARGENTINA_OFFSET_MS);
+}
+
+/** Clave (YYYY-MM-DD, fecha de Argentina) del lunes de la semana que contiene `date`. */
+export function argentinaWeekKey(date: Date): string {
+  const start = argentinaWeekStart(date);
+  return new Date(start.getTime() - ARGENTINA_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+/** Rango [inicio, fin) en instantes reales de la semana (lunes a domingo, hora Argentina) identificada por su clave. */
+export function argentinaWeekRangeFromKey(key: string): { start: Date; end: Date } {
+  const [y, m, d] = key.split("-").map(Number);
+  const start = new Date(Date.UTC(y, m - 1, d) + ARGENTINA_OFFSET_MS);
+  const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+  return { start, end };
+}
+
+/** Clave de la semana anterior o siguiente a la dada. */
+export function shiftWeekKey(key: string, weeks: number): string {
+  const { start } = argentinaWeekRangeFromKey(key);
+  return argentinaWeekKey(new Date(start.getTime() + weeks * 7 * 24 * 60 * 60 * 1000));
+}
+
 /**
  * Margen de ganancia promedio (ponderado por monto vendido) de un conjunto de
  * items vendidos: suma de (precio - costo) sobre suma de precio, solo entre

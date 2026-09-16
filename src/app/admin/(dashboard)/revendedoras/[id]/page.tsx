@@ -2,7 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDate, ORDER_STATUS_LABELS, OrderStatus } from "@/lib/format";
-import { buildCostMap, buildResellerStats, buildRewardProgress } from "@/lib/reports";
+import {
+  buildCostMap,
+  buildResellerStats,
+  buildRewardProgress,
+  argentinaWeekKey,
+  argentinaWeekRangeFromKey,
+} from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +28,13 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
 
   const costMap = buildCostMap(products);
   const stats = buildResellerStats(reseller, orders, costMap);
-  const rewardProgress = buildRewardProgress(stats.totalSales, tiers);
+
+  const currentWeekKey = argentinaWeekKey(new Date());
+  const { start: weekStart, end: weekEnd } = argentinaWeekRangeFromKey(currentWeekKey);
+  const currentWeekTotal = orders
+    .filter((o) => o.status !== "CANCELADO" && o.createdAt >= weekStart && o.createdAt < weekEnd)
+    .reduce((sum, o) => sum + o.total, 0);
+  const rewardProgress = buildRewardProgress(currentWeekTotal, tiers);
 
   return (
     <div>
@@ -51,7 +63,10 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
 
       {rewardProgress.length > 0 && (
         <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 font-bold text-gray-900">Premios</h2>
+          <h2 className="mb-1 font-bold text-gray-900">Premios de esta semana</h2>
+          <p className="mb-3 text-xs text-gray-500">
+            Lleva comprado {formatPrice(currentWeekTotal)} esta semana (lunes a domingo)
+          </p>
           <ul className="flex flex-col gap-4">
             {rewardProgress.map((tier) => (
               <li key={tier.id}>

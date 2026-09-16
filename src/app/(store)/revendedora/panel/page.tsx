@@ -2,10 +2,22 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentReseller } from "@/lib/resellerSession";
 import { formatPrice, formatDate, ORDER_STATUS_LABELS, OrderStatus } from "@/lib/format";
-import { buildRewardProgress } from "@/lib/reports";
+import {
+  buildRewardProgress,
+  argentinaWeekKey,
+  argentinaWeekRangeFromKey,
+  monthKey,
+} from "@/lib/reports";
 import { logoutReseller } from "../actions";
 
 export const dynamic = "force-dynamic";
+
+function formatWeekLabel(key: string): string {
+  const { start } = argentinaWeekRangeFromKey(key);
+  const end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+  const fmt = (d: Date) => `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+  return `Semana del ${fmt(start)} al ${fmt(end)}`;
+}
 
 export default async function RevendedoraPanelPage() {
   const reseller = await getCurrentReseller();
@@ -21,7 +33,28 @@ export default async function RevendedoraPanelPage() {
 
   const activeOrders = orders.filter((o) => o.status !== "CANCELADO");
   const totalCompras = activeOrders.reduce((sum, o) => sum + o.total, 0);
-  const rewardProgress = buildRewardProgress(totalCompras, tiers);
+
+  const currentWeekKey = argentinaWeekKey(new Date());
+  const { start: weekStart, end: weekEnd } = argentinaWeekRangeFromKey(currentWeekKey);
+  const currentWeekOrders = activeOrders.filter((o) => o.createdAt >= weekStart && o.createdAt < weekEnd);
+  const currentWeekTotal = currentWeekOrders.reduce((sum, o) => sum + o.total, 0);
+  const rewardProgress = buildRewardProgress(currentWeekTotal, tiers);
+
+  const weeklyMap = new Map<string, number>();
+  for (const o of activeOrders) {
+    const key = argentinaWeekKey(o.createdAt);
+    weeklyMap.set(key, (weeklyMap.get(key) ?? 0) + o.total);
+  }
+  const weeklyRows = Array.from(weeklyMap.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .slice(0, 8);
+
+  const monthlyMap = new Map<string, number>();
+  for (const o of activeOrders) {
+    const key = monthKey(o.createdAt);
+    monthlyMap.set(key, (monthlyMap.get(key) ?? 0) + o.total);
+  }
+  const monthlyRows = Array.from(monthlyMap.entries()).sort((a, b) => b[0].localeCompare(a[0]));
 
   return (
     <div className="mx-auto max-w-3xl py-8">
@@ -65,7 +98,10 @@ export default async function RevendedoraPanelPage() {
 
       {rewardProgress.length > 0 && (
         <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 font-bold text-gray-900">Premios</h2>
+          <h2 className="mb-1 font-bold text-gray-900">Premios de esta semana</h2>
+          <p className="mb-3 text-xs text-gray-500">
+            {formatWeekLabel(currentWeekKey)} · llevás comprado {formatPrice(currentWeekTotal)}
+          </p>
           <ul className="flex flex-col gap-4">
             {rewardProgress.map((tier) => (
               <li key={tier.id}>
@@ -93,6 +129,39 @@ export default async function RevendedoraPanelPage() {
           </ul>
         </div>
       )}
+
+      <div className="mb-8 grid gap-6 sm:grid-cols-2">
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 font-bold text-gray-900">Tus compras por semana</h2>
+          {weeklyRows.length === 0 ? (
+            <p className="text-sm text-gray-500">Todavía no tenés compras.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-gray-100 text-sm">
+              {weeklyRows.map(([key, total]) => (
+                <li key={key} className="flex items-center justify-between py-2">
+                  <span className="text-gray-700">{formatWeekLabel(key)}</span>
+                  <span className="font-semibold text-gray-900">{formatPrice(total)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 font-bold text-gray-900">Tus compras por mes</h2>
+          {monthlyRows.length === 0 ? (
+            <p className="text-sm text-gray-500">Todavía no tenés compras.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-gray-100 text-sm">
+              {monthlyRows.map(([key, total]) => (
+                <li key={key} className="flex items-center justify-between py-2">
+                  <span className="text-gray-700">{key}</span>
+                  <span className="font-semibold text-gray-900">{formatPrice(total)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-3 font-bold text-gray-900">Tus compras</h2>

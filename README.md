@@ -57,14 +57,16 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   puede **ordenar por más ventas, más ganancia generada o localidad**, y
   cada nombre lleva a una **página de detalle** con los artículos que
   compró, el monto total, la ganancia que le generó al negocio y su
-  progreso en los premios (ver más abajo)
-- **Premios** (`/admin/premios`): sistema de premios por objetivo de ventas.
-  Cada premio tiene un nombre, una descripción opcional y un monto objetivo;
-  se puede editar, desactivar o eliminar en cualquier momento. El objetivo
-  se compara contra el total comprado por cada revendedora (sin contar
-  pedidos cancelados), sin distinguir por período: es acumulado desde
-  siempre. El listado muestra cuántas revendedoras activas ya cumplieron
-  cada uno
+  progreso semanal en los premios (ver más abajo)
+- **Premios** (`/admin/premios`): sistema de premios por objetivo de ventas
+  **semanales** (lunes a domingo, hora Argentina). Cada premio tiene un
+  nombre, una descripción opcional y un monto objetivo; se puede editar,
+  desactivar o eliminar en cualquier momento. La pantalla principal tiene un
+  selector de semana (con flechas para ir a la anterior/siguiente) y, para
+  cada premio, la lista de revendedoras activas que llegaron al objetivo esa
+  semana (con su código y teléfono) para poder mandarles el premio. El monto
+  se compara contra lo que compró cada una esa semana puntual (sin contar
+  pedidos cancelados) — no es acumulado histórico, se reinicia cada semana
 - **Reportes** (`/admin/reportes`): ventas y ganancia neta de hoy, los
   últimos 7 y 30 días, tabla de ventas por día (últimas 2 semanas) y por
   mes, ranking de productos más vendidos y ranking de revendedoras por
@@ -93,9 +95,10 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   `/admin/revendedoras`). La localidad se muestra en el listado de admin
   para organizar los envíos
 - Panel propio (`/revendedora/panel`) donde cada revendedora ve su código,
-  su historial de compras a precio mayorista y su progreso en los
-  **premios** activos (monto que le falta o que ya cumplió), cargados por
-  el admin en `/admin/premios`
+  su progreso de **esta semana** en los premios activos (monto que le falta
+  o que ya cumplió), cargados por el admin en `/admin/premios`, y su
+  historial de compras: por semana (últimas 8), por mes y el detalle de
+  cada pedido
 
 El descuento mayorista se calcula sobre el subtotal del pedido que hace la
 revendedora al comprar con su código.
