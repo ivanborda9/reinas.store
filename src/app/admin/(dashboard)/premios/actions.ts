@@ -15,36 +15,36 @@ export async function createRewardTier(formData: FormData) {
   const data = parseRewardTierForm(formData);
   if (!data.title || data.targetAmount <= 0) {
     redirect(
-      "/admin/regalos/nueva?error=" +
+      "/admin/premios/nueva?error=" +
         encodeURIComponent("Completá el nombre del premio y un monto objetivo mayor a 0.")
     );
   }
 
   await prisma.rewardTier.create({ data });
-  revalidatePath("/admin/regalos");
-  redirect("/admin/regalos");
+  revalidatePath("/admin/premios");
+  redirect("/admin/premios");
 }
 
 export async function updateRewardTier(id: string, formData: FormData) {
   const data = parseRewardTierForm(formData);
   if (!data.title || data.targetAmount <= 0) {
     redirect(
-      `/admin/regalos/${id}/editar?error=` +
+      `/admin/premios/${id}/editar?error=` +
         encodeURIComponent("Completá el nombre del premio y un monto objetivo mayor a 0.")
     );
   }
 
   await prisma.rewardTier.update({ where: { id }, data });
-  revalidatePath("/admin/regalos");
-  redirect("/admin/regalos");
+  revalidatePath("/admin/premios");
+  redirect("/admin/premios");
 }
 
 export async function toggleRewardTierActive(id: string, active: boolean) {
   await prisma.rewardTier.update({ where: { id }, data: { active } });
-  revalidatePath("/admin/regalos");
+  revalidatePath("/admin/premios");
 }
 
 export async function deleteRewardTier(id: string) {
   await prisma.rewardTier.delete({ where: { id } });
-  revalidatePath("/admin/regalos");
+  revalidatePath("/admin/premios");
 }

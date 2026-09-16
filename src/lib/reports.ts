@@ -117,7 +117,7 @@ export function buildResellerStats(
 }
 
 /**
- * Progreso de una revendedora sobre cada regalo, según el total comprado
+ * Progreso de una revendedora sobre cada premio, según el total comprado
  * (`totalSales`) contra el monto objetivo de cada uno. Ordenado por monto
  * objetivo ascendente.
  */

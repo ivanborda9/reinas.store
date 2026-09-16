@@ -25,7 +25,7 @@ export function RewardTierForm({
         <input
           name="title"
           required
-          placeholder="Ej: Bolso de regalo"
+          placeholder="Ej: Bolso de regalo, premio sorpresa"
           defaultValue={initial?.title}
           className="w-full rounded-lg border border-gray-300 px-3 py-2"
         />

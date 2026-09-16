@@ -57,9 +57,9 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   puede **ordenar por más ventas, más ganancia generada o localidad**, y
   cada nombre lleva a una **página de detalle** con los artículos que
   compró, el monto total, la ganancia que le generó al negocio y su
-  progreso en los regalos (ver más abajo)
-- **Regalos** (`/admin/regalos`): sistema de premios por objetivo de ventas.
-  Cada regalo tiene un nombre, una descripción opcional y un monto objetivo;
+  progreso en los premios (ver más abajo)
+- **Premios** (`/admin/premios`): sistema de premios por objetivo de ventas.
+  Cada premio tiene un nombre, una descripción opcional y un monto objetivo;
   se puede editar, desactivar o eliminar en cualquier momento. El objetivo
   se compara contra el total comprado por cada revendedora (sin contar
   pedidos cancelados), sin distinguir por período: es acumulado desde
@@ -94,8 +94,8 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   para organizar los envíos
 - Panel propio (`/revendedora/panel`) donde cada revendedora ve su código,
   su historial de compras a precio mayorista y su progreso en los
-  **regalos** activos (monto que le falta o que ya cumplió), cargados por
-  el admin en `/admin/regalos`
+  **premios** activos (monto que le falta o que ya cumplió), cargados por
+  el admin en `/admin/premios`
 
 El descuento mayorista se calcula sobre el subtotal del pedido que hace la
 revendedora al comprar con su código.

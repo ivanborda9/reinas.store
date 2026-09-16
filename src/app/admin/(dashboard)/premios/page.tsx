@@ -24,23 +24,23 @@ export default async function AdminRewardsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Regalos</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Premios</h1>
           <p className="mt-1 text-sm text-gray-500">
             Objetivos de ventas y premios para las revendedoras. El monto se compara contra el
             total comprado por cada una (sin contar pedidos cancelados).
           </p>
         </div>
         <Link
-          href="/admin/regalos/nueva"
+          href="/admin/premios/nueva"
           className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
         >
-          + Nuevo regalo
+          + Nuevo premio
         </Link>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         {tiers.length === 0 ? (
-          <p className="p-6 text-center text-sm text-gray-500">Todavía no cargaste ningún regalo.</p>
+          <p className="p-6 text-center text-sm text-gray-500">Todavía no cargaste ningún premio.</p>
         ) : (
           <ul className="divide-y divide-gray-100">
             {tiers.map((tier) => {
@@ -66,7 +66,7 @@ export default async function AdminRewardsPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Link
-                      href={`/admin/regalos/${tier.id}/editar`}
+                      href={`/admin/premios/${tier.id}/editar`}
                       className="text-sm text-brand-600 hover:underline"
                     >
                       Editar
@@ -78,7 +78,7 @@ export default async function AdminRewardsPage() {
                     </form>
                     <form action={deleteRewardTier.bind(null, tier.id)}>
                       <ConfirmSubmitButton
-                        confirmMessage="¿Eliminar este regalo?"
+                        confirmMessage="¿Eliminar este premio?"
                         className="text-sm text-red-500 hover:underline"
                       >
                         Eliminar

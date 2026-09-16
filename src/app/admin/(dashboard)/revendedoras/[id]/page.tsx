@@ -51,7 +51,7 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
 
       {rewardProgress.length > 0 && (
         <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 font-bold text-gray-900">Regalos</h2>
+          <h2 className="mb-3 font-bold text-gray-900">Premios</h2>
           <ul className="flex flex-col gap-4">
             {rewardProgress.map((tier) => (
               <li key={tier.id}>
