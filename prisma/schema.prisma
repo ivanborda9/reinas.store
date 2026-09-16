@@ -90,6 +90,19 @@ model RewardTier {
   targetAmount Float
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
+
+  schedules RewardSchedule[]
+}
+
+/// Asigna un premio a una semana puntual (lunes, hora Argentina, ej. "2026-09-14").
+model RewardSchedule {
+  id           String     @id @default(cuid())
+  weekKey      String
+  rewardTierId String
+  rewardTier   RewardTier @relation(fields: [rewardTierId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([weekKey, rewardTierId])
 }
 
 model Banner {

@@ -16,25 +16,32 @@ export default async function ResellerDetailPage({ params }: { params: { id: str
   const reseller = await prisma.reseller.findUnique({ where: { id: params.id } });
   if (!reseller) notFound();
 
-  const [orders, products, tiers] = await Promise.all([
+  const currentWeekKey = argentinaWeekKey(new Date());
+
+  const [orders, products, schedules] = await Promise.all([
     prisma.order.findMany({
       where: { resellerId: reseller.id },
       include: { items: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.product.findMany({ select: { id: true, costPrice: true } }),
-    prisma.rewardTier.findMany({ where: { active: true } }),
+    prisma.rewardSchedule.findMany({
+      where: { weekKey: currentWeekKey, rewardTier: { active: true } },
+      include: { rewardTier: true },
+    }),
   ]);
 
   const costMap = buildCostMap(products);
   const stats = buildResellerStats(reseller, orders, costMap);
 
-  const currentWeekKey = argentinaWeekKey(new Date());
   const { start: weekStart, end: weekEnd } = argentinaWeekRangeFromKey(currentWeekKey);
   const currentWeekTotal = orders
     .filter((o) => o.status !== "CANCELADO" && o.createdAt >= weekStart && o.createdAt < weekEnd)
     .reduce((sum, o) => sum + o.total, 0);
-  const rewardProgress = buildRewardProgress(currentWeekTotal, tiers);
+  const rewardProgress = buildRewardProgress(
+    currentWeekTotal,
+    schedules.map((s) => s.rewardTier)
+  );
 
   return (
     <div>

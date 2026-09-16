@@ -59,14 +59,22 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   compró, el monto total, la ganancia que le generó al negocio y su
   progreso semanal en los premios (ver más abajo)
 - **Premios** (`/admin/premios`): sistema de premios por objetivo de ventas
-  **semanales** (lunes a domingo, hora Argentina). Cada premio tiene un
-  nombre, una descripción opcional y un monto objetivo; se puede editar,
-  desactivar o eliminar en cualquier momento. La pantalla principal tiene un
-  selector de semana (con flechas para ir a la anterior/siguiente) y, para
-  cada premio, la lista de revendedoras activas que llegaron al objetivo esa
-  semana (con su código y teléfono) para poder mandarles el premio. El monto
-  se compara contra lo que compró cada una esa semana puntual (sin contar
-  pedidos cancelados) — no es acumulado histórico, se reinicia cada semana
+  **semanales** (lunes a domingo, hora Argentina), donde cada semana puede
+  tener premios distintos:
+  - Cada premio (nombre, descripción opcional y monto objetivo) se crea una
+    sola vez y después se **asigna a las semanas que quieras** desde el
+    **calendario** (las próximas 8 semanas, con un `+ Agregar premio` por
+    semana y una `×` para sacarlo). Un mismo premio se puede repetir en
+    varias semanas o no volver a usarse nunca más
+  - La pantalla principal tiene un selector de semana (con flechas para ir a
+    la anterior/siguiente) y muestra, para cada premio asignado a esa
+    semana, la lista de revendedoras activas que llegaron al objetivo (con
+    su código y teléfono) para poder mandarles el premio. El monto se
+    compara contra lo que compró cada una esa semana puntual (sin contar
+    pedidos cancelados) — no es acumulado histórico, se reinicia cada semana
+  - Desactivar un premio (sin sacarlo del calendario) hace que deje de
+    contar en cualquier semana en la que esté programado, sin perder esa
+    programación
 - **Reportes** (`/admin/reportes`): ventas y ganancia neta de hoy, los
   últimos 7 y 30 días, tabla de ventas por día (últimas 2 semanas) y por
   mes, ranking de productos más vendidos y ranking de revendedoras por
@@ -95,10 +103,10 @@ clienta es su ganancia; el sitio no la calcula ni la necesita saber.
   `/admin/revendedoras`). La localidad se muestra en el listado de admin
   para organizar los envíos
 - Panel propio (`/revendedora/panel`) donde cada revendedora ve su código,
-  su progreso de **esta semana** en los premios activos (monto que le falta
-  o que ya cumplió), cargados por el admin en `/admin/premios`, y su
-  historial de compras: por semana (últimas 8), por mes y el detalle de
-  cada pedido
+  su progreso de **esta semana** en los premios que estén programados para
+  esta semana en el calendario del admin (monto que le falta o que ya
+  cumplió), y su historial de compras: por semana (últimas 8), por mes y el
+  detalle de cada pedido
 
 El descuento mayorista se calcula sobre el subtotal del pedido que hace la
 revendedora al comprar con su código.

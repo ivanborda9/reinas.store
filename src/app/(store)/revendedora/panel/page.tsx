@@ -23,22 +23,29 @@ export default async function RevendedoraPanelPage() {
   const reseller = await getCurrentReseller();
   if (!reseller) redirect("/revendedora/login");
 
-  const [orders, tiers] = await Promise.all([
+  const currentWeekKey = argentinaWeekKey(new Date());
+
+  const [orders, schedules] = await Promise.all([
     prisma.order.findMany({
       where: { resellerId: reseller.id },
       orderBy: { createdAt: "desc" },
     }),
-    prisma.rewardTier.findMany({ where: { active: true } }),
+    prisma.rewardSchedule.findMany({
+      where: { weekKey: currentWeekKey, rewardTier: { active: true } },
+      include: { rewardTier: true },
+    }),
   ]);
 
   const activeOrders = orders.filter((o) => o.status !== "CANCELADO");
   const totalCompras = activeOrders.reduce((sum, o) => sum + o.total, 0);
 
-  const currentWeekKey = argentinaWeekKey(new Date());
   const { start: weekStart, end: weekEnd } = argentinaWeekRangeFromKey(currentWeekKey);
   const currentWeekOrders = activeOrders.filter((o) => o.createdAt >= weekStart && o.createdAt < weekEnd);
   const currentWeekTotal = currentWeekOrders.reduce((sum, o) => sum + o.total, 0);
-  const rewardProgress = buildRewardProgress(currentWeekTotal, tiers);
+  const rewardProgress = buildRewardProgress(
+    currentWeekTotal,
+    schedules.map((s) => s.rewardTier)
+  );
 
   const weeklyMap = new Map<string, number>();
   for (const o of activeOrders) {

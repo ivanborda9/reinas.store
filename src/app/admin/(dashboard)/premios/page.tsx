@@ -3,9 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
 import { argentinaWeekKey, argentinaWeekRangeFromKey, shiftWeekKey } from "@/lib/reports";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
-import { toggleRewardTierActive, deleteRewardTier } from "./actions";
+import {
+  toggleRewardTierActive,
+  deleteRewardTier,
+  scheduleRewardTier,
+  unscheduleRewardTier,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const CALENDAR_WEEKS = 8;
 
 function formatWeekLabel(key: string): string {
   const { start } = argentinaWeekRangeFromKey(key);
@@ -13,6 +20,13 @@ function formatWeekLabel(key: string): string {
   const fmt = (d: Date) =>
     `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${d.getUTCFullYear()}`;
   return `Semana del ${fmt(start)} al ${fmt(end)}`;
+}
+
+function formatWeekLabelShort(key: string): string {
+  const { start } = argentinaWeekRangeFromKey(key);
+  const end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+  const fmt = (d: Date) => `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+  return `${fmt(start)} al ${fmt(end)}`;
 }
 
 export default async function AdminRewardsPage({
@@ -24,11 +38,24 @@ export default async function AdminRewardsPage({
   const selectedWeekKey = searchParams.semana || currentWeekKey;
   const { start: weekStart, end: weekEnd } = argentinaWeekRangeFromKey(selectedWeekKey);
 
-  const [tiers, resellers, orders] = await Promise.all([
+  const calendarWeekKeys: string[] = [];
+  for (let i = 0; i < CALENDAR_WEEKS; i++) {
+    calendarWeekKeys.push(shiftWeekKey(currentWeekKey, i));
+  }
+
+  const [tiers, resellers, orders, selectedWeekSchedules, calendarSchedules] = await Promise.all([
     prisma.rewardTier.findMany({ orderBy: { targetAmount: "asc" } }),
     prisma.reseller.findMany({ where: { active: true } }),
     prisma.order.findMany({
       where: { status: { not: "CANCELADO" }, createdAt: { gte: weekStart, lt: weekEnd } },
+    }),
+    prisma.rewardSchedule.findMany({
+      where: { weekKey: selectedWeekKey },
+      include: { rewardTier: true },
+    }),
+    prisma.rewardSchedule.findMany({
+      where: { weekKey: { in: calendarWeekKeys } },
+      include: { rewardTier: true },
     }),
   ]);
 
@@ -38,13 +65,22 @@ export default async function AdminRewardsPage({
     totalsByReseller.set(o.resellerId, (totalsByReseller.get(o.resellerId) ?? 0) + o.total);
   }
 
-  const tierResults = tiers.map((tier) => ({
-    tier,
-    achievers: resellers
-      .map((r) => ({ reseller: r, total: totalsByReseller.get(r.id) ?? 0 }))
-      .filter((x) => x.total >= tier.targetAmount)
-      .sort((a, b) => b.total - a.total),
-  }));
+  const tierResults = selectedWeekSchedules
+    .map((s) => s.rewardTier)
+    .sort((a, b) => a.targetAmount - b.targetAmount)
+    .map((tier) => ({
+      tier,
+      achievers: resellers
+        .map((r) => ({ reseller: r, total: totalsByReseller.get(r.id) ?? 0 }))
+        .filter((x) => x.total >= tier.targetAmount)
+        .sort((a, b) => b.total - a.total),
+    }));
+
+  const calendarByWeek = new Map<string, typeof calendarSchedules>();
+  for (const key of calendarWeekKeys) calendarByWeek.set(key, []);
+  for (const s of calendarSchedules) {
+    calendarByWeek.get(s.weekKey)?.push(s);
+  }
 
   return (
     <div>
@@ -52,8 +88,8 @@ export default async function AdminRewardsPage({
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Premios</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Los objetivos son semanales (lunes a domingo): se comparan contra lo que compró cada
-            revendedora esa semana (sin contar pedidos cancelados).
+            Los objetivos son semanales (lunes a domingo) y cada semana puede tener premios
+            distintos: asignalos en el calendario de abajo.
           </p>
         </div>
         <Link
@@ -90,7 +126,7 @@ export default async function AdminRewardsPage({
       <div className="mb-8 flex flex-col gap-4">
         {tierResults.length === 0 ? (
           <p className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">
-            Todavía no cargaste ningún premio.
+            No hay premios programados para esta semana. Asignalos en el calendario de abajo.
           </p>
         ) : (
           tierResults.map(({ tier, achievers }) => (
@@ -109,7 +145,12 @@ export default async function AdminRewardsPage({
                   </span>
                 )}
               </div>
-              {achievers.length === 0 ? (
+              {!tier.active ? (
+                <p className="text-sm text-gray-500">
+                  Este premio está desactivado, así que no cuenta aunque esté programado para esta
+                  semana.
+                </p>
+              ) : achievers.length === 0 ? (
                 <p className="text-sm text-gray-500">Ninguna revendedora llegó a este objetivo esta semana.</p>
               ) : (
                 <ul className="flex flex-col divide-y divide-gray-100 text-sm">
@@ -135,6 +176,73 @@ export default async function AdminRewardsPage({
             </div>
           ))
         )}
+      </div>
+
+      <div className="mb-3 text-sm font-semibold text-gray-700">Calendario de premios</div>
+      <p className="mb-3 text-xs text-gray-500">
+        Elegí qué premios aplican en cada una de las próximas semanas.
+      </p>
+      <div className="mb-8 overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <ul className="divide-y divide-gray-100">
+          {calendarWeekKeys.map((key) => {
+            const scheduled = calendarByWeek.get(key) ?? [];
+            const scheduledTierIds = new Set(scheduled.map((s) => s.rewardTierId));
+            const availableTiers = tiers.filter((t) => !scheduledTierIds.has(t.id));
+            return (
+              <li key={key} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:gap-4">
+                <div className="w-40 flex-shrink-0">
+                  <p className="text-sm font-semibold text-gray-900">{formatWeekLabelShort(key)}</p>
+                  {key === currentWeekKey && (
+                    <span className="text-xs text-brand-600">Esta semana</span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  {scheduled.length === 0 ? (
+                    <p className="mb-2 text-xs text-gray-400">Sin premios asignados.</p>
+                  ) : (
+                    <div className="mb-2 flex flex-wrap gap-2">
+                      {scheduled.map((s) => (
+                        <span
+                          key={s.id}
+                          className="flex items-center gap-1 rounded-full bg-brand-50 px-2 py-1 text-xs font-medium text-brand-700"
+                        >
+                          {s.rewardTier.title}
+                          <form action={unscheduleRewardTier.bind(null, s.id)}>
+                            <button type="submit" className="ml-1 text-brand-400 hover:text-brand-700">
+                              ×
+                            </button>
+                          </form>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {availableTiers.length > 0 && (
+                    <form action={scheduleRewardTier.bind(null, key)} className="flex gap-2">
+                      <select
+                        name="rewardTierId"
+                        required
+                        className="rounded-lg border border-gray-300 px-2 py-1 text-xs"
+                      >
+                        <option value="">Agregar premio...</option>
+                        {availableTiers.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.title}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700"
+                      >
+                        Agregar
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       <div className="mb-3 text-sm font-semibold text-gray-700">Premios configurados</div>
@@ -173,7 +281,7 @@ export default async function AdminRewardsPage({
                   </form>
                   <form action={deleteRewardTier.bind(null, tier.id)}>
                     <ConfirmSubmitButton
-                      confirmMessage="¿Eliminar este premio?"
+                      confirmMessage="¿Eliminar este premio? También se quita de cualquier semana en la que estuviera programado."
                       className="text-sm text-red-500 hover:underline"
                     >
                       Eliminar

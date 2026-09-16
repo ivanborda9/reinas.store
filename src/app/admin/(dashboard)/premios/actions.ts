@@ -48,3 +48,20 @@ export async function deleteRewardTier(id: string) {
   await prisma.rewardTier.delete({ where: { id } });
   revalidatePath("/admin/premios");
 }
+
+export async function scheduleRewardTier(weekKey: string, formData: FormData) {
+  const rewardTierId = String(formData.get("rewardTierId") || "");
+  if (!rewardTierId) return;
+
+  await prisma.rewardSchedule.upsert({
+    where: { weekKey_rewardTierId: { weekKey, rewardTierId } },
+    update: {},
+    create: { weekKey, rewardTierId },
+  });
+  revalidatePath("/admin/premios");
+}
+
+export async function unscheduleRewardTier(scheduleId: string) {
+  await prisma.rewardSchedule.delete({ where: { id: scheduleId } });
+  revalidatePath("/admin/premios");
+}
